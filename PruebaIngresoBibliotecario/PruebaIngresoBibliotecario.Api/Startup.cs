@@ -6,8 +6,8 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
-
-
+using PruebaIngresoBibliotecario.Api.Respository;
+using AutoMapper;
 
 namespace PruebaIngresoBibliotecario.Api
 {
@@ -28,6 +28,17 @@ namespace PruebaIngresoBibliotecario.Api
 
             services.AddSwaggerDocument();
 
+            //Mapper
+            IMapper mapper = MappingConfig.RegisterMaps().CreateMapper();
+            services.AddSingleton(mapper);
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+
+            //Repositorios
+            services.AddScoped<IPrestamoRepository, PrestamoRepositoty>();
+
+
+            //Contexto BD
             services.AddDbContext<Infrastructure.PersistenceContext>(opt =>
             {
                 opt.UseInMemoryDatabase("PruebaIngreso");
