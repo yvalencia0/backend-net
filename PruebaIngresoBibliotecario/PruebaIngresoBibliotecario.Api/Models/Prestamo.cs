@@ -4,12 +4,14 @@ namespace PruebaIngresoBibliotecario.Api.Models
 {
     public class Prestamo
     {
+        public string id { get; set; }
+
         [Key]
         public string isbn { get; set; }
 
         [Required]
         [StringLength(10)]
-        public int identificacionUsuario { get; set; }
+        public string identificacionUsuario { get; set; }
 
         [Required]
         public int tipoUsuario { get; set; }

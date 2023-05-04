@@ -35,7 +35,7 @@ namespace PruebaIngresoBibliotecario.Api
 
 
             //Repositorios
-            services.AddScoped<IPrestamoRepository, PrestamoRepositoty>();
+            services.AddScoped<IPrestamoRepository, PrestamoRepository>();
 
 
             //Contexto BD
