@@ -21,9 +21,9 @@ namespace PruebaIngresoBibliotecario.Api.Respository
             _mapper = mapper;
         }
 
-        public async Task<PrestamoDto> CreatePrestamo(PrestamoDto prestamoDto, string token)
+        public async Task<PrestamoPostResponseDto> CreatePrestamo(PrestamoPostDto prestamoDto, string id)
         {
-            Prestamo prestamo = _mapper.Map<PrestamoDto, Prestamo>(prestamoDto);
+            Prestamo prestamo = _mapper.Map<PrestamoPostDto, Prestamo>(prestamoDto);
 
             //string date = DateTime.UtcNow.ToString("MM-dd-yyyy");
             DateTime nuevaFecha = Convert.ToDateTime(DateTime.UtcNow.ToString("dd-MM-yyyy"));
@@ -38,10 +38,29 @@ namespace PruebaIngresoBibliotecario.Api.Respository
                     dias = 8;
                     break;
                 case 3:
-                    var query = from p in _db.Prestamos where p.identificacionUsuario == prestamoDto.identificacionUsuario select p.identificacionUsuario;
-                        prestamo.identificacionUsuario = query.ToString();
-                        return _mapper.Map<Prestamo, PrestamoDto>(prestamo);
-                    
+
+                    IQueryable<string> xxxx = (from p in _db.Prestamos
+                                                 where p.identificacionUsuario == (prestamoDto.identificacionUsuario)
+                                                 select p.identificacionUsuario);
+
+                    //var query = (from p in _db.Prestamos where p.identificacionUsuario.Contains(prestamoDto.identificacionUsuario) select new { p.identificacionUsuario }).ToList();
+                    if (xxxx.Count() > 0)
+                    {
+
+                        prestamo.id = null;
+                        return _mapper.Map<Prestamo, PrestamoPostResponseDto>(prestamo);
+                    }
+                    //prestamo.isbn = xxxx.Count().ToString();
+                    /*
+                    else
+                    {
+                        foreach (var item in xxxx)
+                        {
+                            prestamo.isbn = item.ToString();
+                        }
+                            //return _mapper.Map<Prestamo, PrestamoDto>(prestamo);
+                    }
+                    */
                     dias = 7;
                     break;
             }
@@ -59,13 +78,13 @@ namespace PruebaIngresoBibliotecario.Api.Respository
                 }
             }
 
-            prestamo.id = token;
+            prestamo.id = id;
             prestamo.fechaMaximaDevolucion = nuevaFecha.ToString().Substring(0,10);
 
 
             await _db.Prestamos.AddAsync(prestamo);
             await _db.SaveChangesAsync();
-            return _mapper.Map<Prestamo, PrestamoDto>(prestamo);
+            return _mapper.Map<Prestamo, PrestamoPostResponseDto>(prestamo);
 
 
         }
@@ -87,10 +106,10 @@ namespace PruebaIngresoBibliotecario.Api.Respository
             */
         }
 
-        public async Task<List<PrestamoDto>> GetPrestamos()
+        public async Task<List<PrestamoPostDto>> GetPrestamos()
         {
             List<Prestamo> lista = await _db.Prestamos.ToListAsync();
-            return _mapper.Map<List<PrestamoDto>>(lista);
+            return _mapper.Map<List<PrestamoPostDto>>(lista);
             //throw new System.NotImplementedException();
         }
     }

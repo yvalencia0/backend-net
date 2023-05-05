@@ -7,6 +7,7 @@ using System;
 using PruebaIngresoBibliotecario.Api.Models;
 using Elasticsearch.Net.Specification.TasksApi;
 using Microsoft.AspNetCore.Routing;
+using System.Linq;
 
 namespace PruebaIngresoBibliotecario.Api.Controllers
 {
@@ -29,20 +30,18 @@ namespace PruebaIngresoBibliotecario.Api.Controllers
         {
             try
             {
+                //trae la lista de prestamos
                 var lista = await _prestamoRepository.GetPrestamos();
                 _response.mensaje = lista;
-
-                //_response.Result = lista;
-                //_response.DisplayMessage = "Lista de Prestamos";
+                return Ok(lista);
             }
             catch (Exception ex)
             {
-                //_response.IsSuccess = false;
-                //_response.ErrorMessages = new List<string> { ex.ToString() };
+                //Error al mostrar los prestamos
                 _response.mensaje = "Error al mostrar los prestamos ->" + ex.ToString();
+                return BadRequest(_response);
             }
 
-            return Ok(_response);
         }
 
         //Trae un prestamo
@@ -62,49 +61,60 @@ namespace PruebaIngresoBibliotecario.Api.Controllers
 
         //Crea un prestamo
         [HttpPost]
-        public async Task<ActionResult<Prestamo>> PostPrestamo(PrestamoDto prestamoDto)
+        public async Task<ActionResult<Prestamo>> PostPrestamo(PrestamoPostDto prestamoPostDto)
         {
-            //Valida tipo de usuaurio
-            if (prestamoDto.tipoUsuario > 3 || prestamoDto.tipoUsuario < 1)
+            //Valida que tipo de usuaurio este permitido
+            if (prestamoPostDto.tipoUsuario > 3 || prestamoPostDto.tipoUsuario < 1)
             {
                 _response.mensaje = "Error, debe elegir un tipo de usuario valido-> 1: Usuario afiliado, 2: Usuario empleado de la biblioteca, 3: Usuario invitado";
                 return BadRequest(_response);
             }
 
-            int longitud = 7;
+            if (prestamoPostDto.identificacionUsuario.Length > 10)
+            {
+                _response.mensaje = "Error, el campo identificacionUsuario no puede superar los 10 caracteres";
+                return BadRequest(_response);
+            }
+            else
+            {
+
+                //return BadRequest(prestamoPostDto.identificacionUsuario.Substring(0,1).All(char.IsLetter));
+                for (int i = 0; i < prestamoPostDto.identificacionUsuario.Length; i++)
+                {
+                    if (prestamoPostDto.identificacionUsuario.Substring(i, i+1).All(char.IsDigit) || prestamoPostDto.identificacionUsuario.Substring(i, i+1).All(char.IsLetter))
+                    {
+                        //_response.mensaje = "Error, el campo identificacionUsuario solo puede contener letras o numeros";
+                        //return BadRequest(_response);
+                    }
+                    else
+                    {
+                        _response.mensaje = "Error, el campo identificacionUsuario solo puede contener letras o numeros";
+                        return BadRequest(_response);
+                    }
+                }
+            }
+
+            //Genera una cadena de caracteres para incluirla en el campo id
+            int longitud = 20;
             Guid miGuid = Guid.NewGuid();
-            string token = miGuid.ToString().Replace("-", string.Empty).Substring(0, longitud);
-
-            //Valida que un invitado solo pueda tener un libro
-            // String.Equals(root, root2, StringComparison.OrdinalIgnoreCase);
-            //String.Equals(prestamoDto.tipoUsuario.ToString(), "3", StringComparison.OrdinalIgnoreCase
-            /*
-                        if (prestamoDto.tipoUsuario == 3)
-                        {
-                            var existe = _prestamoRepository.GetPrestamoById(prestamoDto.identificacionUsuario);
-                            if (existe != null)
-                            {
-                                _response.mensaje = $"El usuario con identificacion {prestamoDto.identificacionUsuario} ya tiene un libro prestado por lo cual no se le puede realizar otro prestamo";
-
-                                return BadRequest(existe);
-                            }
-                        }
-            */
+            string id = miGuid.ToString().Replace("-", string.Empty).Substring(0, longitud);
 
             try
             {
-                PrestamoDto model = await _prestamoRepository.CreatePrestamo(prestamoDto, token);
-                if(model.identificacionUsuario == null)
+                PrestamoPostResponseDto model = await _prestamoRepository.CreatePrestamo(prestamoPostDto, id);
+
+                if(model.id == null)
                 {
-                    _response.mensaje = $"El usuario con identificacion {prestamoDto.identificacionUsuario} ya tiene un libro prestado por lo cual no se le puede realizar otro prestamo";
+                    _response.mensaje = $"El usuario con identificacion {prestamoPostDto.identificacionUsuario} ya tiene un libro prestado por lo cual no se le puede realizar otro prestamo";
+                    return BadRequest(_response);
                 }
                 else
                 {
                     _response.mensaje = model;
+                    return Ok(model);
                 }
 
                 //_response.Result = model;
-                return CreatedAtAction("GetPrestamos", new { id = model.identificacionUsuario }, _response);
             }
             catch (Exception ex)
             {

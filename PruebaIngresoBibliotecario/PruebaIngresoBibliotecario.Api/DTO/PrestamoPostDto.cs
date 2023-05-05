@@ -2,7 +2,7 @@
 
 namespace PruebaIngresoBibliotecario.Api.DTO
 {
-    public class PrestamoDto
+    public class PrestamoPostDto
     {
         public string isbn { get; set; }
         public string identificacionUsuario { get; set; }

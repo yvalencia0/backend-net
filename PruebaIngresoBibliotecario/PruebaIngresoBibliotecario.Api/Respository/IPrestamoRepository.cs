@@ -7,8 +7,8 @@ namespace PruebaIngresoBibliotecario.Api.Respository
 {
     public interface IPrestamoRepository
     {
-        Task<List<PrestamoDto>> GetPrestamos();
+        Task<List<PrestamoPostDto>> GetPrestamos();
         Task<Prestamo> GetPrestamoById(string isbn);
-        Task<PrestamoDto> CreatePrestamo(PrestamoDto prestamoDto, string token);
+        Task<PrestamoPostResponseDto> CreatePrestamo(PrestamoPostDto prestamoDto, string id);
     }
 }

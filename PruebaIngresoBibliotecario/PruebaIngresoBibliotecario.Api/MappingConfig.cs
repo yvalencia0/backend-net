@@ -10,9 +10,13 @@ namespace PruebaIngresoBibliotecario.Api
         {
             var mappingConfig = new MapperConfiguration(config =>
             {
-                //Agregaremos los mapeos del model a su respectivo DTO
-                config.CreateMap<PrestamoDto, Prestamo>();
-                config.CreateMap<Prestamo, PrestamoDto>();
+                //Agregaremos los mapeos para convertir de Prestamo a PrestamoPostDto y viceversa
+                config.CreateMap<PrestamoPostDto, Prestamo>();
+                config.CreateMap<Prestamo, PrestamoPostDto>();
+
+                //Agregaremos los mapeos para convertir de Prestamo a PrestamoPostResponseDto y viceversa
+                config.CreateMap<PrestamoPostResponseDto, Prestamo>();
+                config.CreateMap<Prestamo, PrestamoPostResponseDto>();
             });
 
             return mappingConfig;
