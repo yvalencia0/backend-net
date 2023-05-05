@@ -16,6 +16,6 @@ namespace PruebaIngresoBibliotecario.Api.Models
         [Required]
         public int tipoUsuario { get; set; }
 
-        public int fechaMaximaDevolucion { get; set; }
+        public string fechaMaximaDevolucion { get; set; }
     }
 }

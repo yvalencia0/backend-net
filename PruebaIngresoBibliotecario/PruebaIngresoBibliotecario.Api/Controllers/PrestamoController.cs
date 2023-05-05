@@ -56,8 +56,7 @@ namespace PruebaIngresoBibliotecario.Api.Controllers
                 _response.mensaje = $"El prestamo con id {id} no existe";
                 return NotFound(_response);
             }
-            _response.mensaje = prestamo;
-            return Ok(_response);
+            return Ok(prestamo);
         }
 
 
@@ -95,7 +94,14 @@ namespace PruebaIngresoBibliotecario.Api.Controllers
             try
             {
                 PrestamoDto model = await _prestamoRepository.CreatePrestamo(prestamoDto, token);
-                _response.mensaje = model;
+                if(model.identificacionUsuario == null)
+                {
+                    _response.mensaje = $"El usuario con identificacion {prestamoDto.identificacionUsuario} ya tiene un libro prestado por lo cual no se le puede realizar otro prestamo";
+                }
+                else
+                {
+                    _response.mensaje = model;
+                }
 
                 //_response.Result = model;
                 return CreatedAtAction("GetPrestamos", new { id = model.identificacionUsuario }, _response);
