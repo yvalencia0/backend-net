@@ -8,6 +8,7 @@ using PruebaIngresoBibliotecario.Api.Models;
 using Elasticsearch.Net.Specification.TasksApi;
 using Microsoft.AspNetCore.Routing;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace PruebaIngresoBibliotecario.Api.Controllers
 {
@@ -17,6 +18,7 @@ namespace PruebaIngresoBibliotecario.Api.Controllers
     {
         private readonly IPrestamoRepository _prestamoRepository;
         protected ResponseDto _response;
+        //private static readonly Regex regex = new Regex("^[a-zA-Z0-9]*$");
 
         public PrestamoController(IPrestamoRepository prestamoRepository)
         {
@@ -70,34 +72,29 @@ namespace PruebaIngresoBibliotecario.Api.Controllers
                 return BadRequest(_response);
             }
 
-            if (prestamoPostDto.identificacionUsuario.Length > 10)
+            //Valida que el campo isbn tenga minimo un caracter
+            if (prestamoPostDto.isbn.Length < 1)
             {
-                _response.mensaje = "Error, el campo identificacionUsuario no puede superar los 10 caracteres";
+                _response.mensaje = "Error, el campo isb es obligatorio, debe contener minimo un caracter";
                 return BadRequest(_response);
             }
-            else
-            {
 
-                //return BadRequest(prestamoPostDto.identificacionUsuario.Substring(0,1).All(char.IsLetter));
-                for (int i = 0; i < prestamoPostDto.identificacionUsuario.Length; i++)
-                {
-                    if (prestamoPostDto.identificacionUsuario.Substring(i, i+1).All(char.IsDigit) || prestamoPostDto.identificacionUsuario.Substring(i, i+1).All(char.IsLetter))
-                    {
-                        //_response.mensaje = "Error, el campo identificacionUsuario solo puede contener letras o numeros";
-                        //return BadRequest(_response);
-                    }
-                    else
-                    {
-                        _response.mensaje = "Error, el campo identificacionUsuario solo puede contener letras o numeros";
-                        return BadRequest(_response);
-                    }
-                }
+            //Valida que el campo identificacionUsuario sea maximo de 10 caracteres
+            if (prestamoPostDto.identificacionUsuario.Length < 1 || prestamoPostDto.identificacionUsuario.Length > 10)
+            {
+                _response.mensaje = "Error, el campo identificacionUsuario debe contener minimo 1 caracter y no puede superar los 10 caracteres";
+                return BadRequest(_response);
+            }
+
+            //Valida que solo se puedan ingresar caracteres alfanumericos en identificacionUsuario
+            if (!prestamoPostDto.identificacionUsuario.All(char.IsLetterOrDigit))
+            {
+                _response.mensaje = "Error, el campo identificacionUsuario solo puede contener letras o numeros";
+                return BadRequest(_response);
             }
 
             //Genera una cadena de caracteres para incluirla en el campo id
-            int longitud = 20;
-            Guid miGuid = Guid.NewGuid();
-            string id = miGuid.ToString().Replace("-", string.Empty).Substring(0, longitud);
+            string id = Guid.NewGuid().ToString();
 
             try
             {
@@ -114,16 +111,9 @@ namespace PruebaIngresoBibliotecario.Api.Controllers
                     return Ok(model);
                 }
 
-                //_response.Result = model;
             }
             catch (Exception ex)
             {
-                //_response.IsSuccess = false;
-                //_response.DisplayMessage = "Error al grabar el registro";
-                //_response.ErrorMessages = new List<string> { ex.ToString() };
-                
-                //_response.mensaje = "Error al crear un prestamo ->" + ex.ToString();
-
                 return BadRequest("Error al crear un prestamo ->" + ex.ToString());
             }
         }
