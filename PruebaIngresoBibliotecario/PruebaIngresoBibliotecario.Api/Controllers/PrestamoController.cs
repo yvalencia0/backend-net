@@ -8,7 +8,6 @@ using PruebaIngresoBibliotecario.Api.Models;
 using Elasticsearch.Net.Specification.TasksApi;
 using Microsoft.AspNetCore.Routing;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace PruebaIngresoBibliotecario.Api.Controllers
 {
@@ -18,7 +17,6 @@ namespace PruebaIngresoBibliotecario.Api.Controllers
     {
         private readonly IPrestamoRepository _prestamoRepository;
         protected ResponseDto _response;
-        //private static readonly Regex regex = new Regex("^[a-zA-Z0-9]*$");
 
         public PrestamoController(IPrestamoRepository prestamoRepository)
         {

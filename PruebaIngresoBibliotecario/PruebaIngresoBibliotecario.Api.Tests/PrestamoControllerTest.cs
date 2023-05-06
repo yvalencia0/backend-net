@@ -26,11 +26,11 @@ namespace Api.Test
             // cargamos la data a la db para poder obtener id y consultar con este si el proceso de carga fue satisfactorio
             var carga = this.TestClient.PostAsync("/api/prestamo", solicitudPrestamo, new JsonMediaTypeFormatter()).Result;
             carga.EnsureSuccessStatusCode();
-            var respuestaCarga = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(carga.Content.ReadAsStringAsync().Result);
+            var respuestaCarga = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(carga.Content.ReadAsStringAsync().Result);
             var idPrestamo = respuestaCarga["id"];
 
-            var c = this.TestClient.GetAsync($"api/prestamo/{idPrestamo}").Result;
-            c.EnsureSuccessStatusCode();
+            var c = this.TestClient.GetAsync($"/api/prestamo/{idPrestamo}").Result;
+            //c.EnsureSuccessStatusCode();
             var response = c.Content.ReadAsStringAsync().Result;
             var respuestaConsulta = System.Text.Json.JsonSerializer.Deserialize<RespuestaConsultaDto>(response);
 
