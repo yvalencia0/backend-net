@@ -25,6 +25,7 @@ namespace PruebaIngresoBibliotecario.Api.Controllers
         }
 
         //Trae todos los prestamos
+/*
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Prestamo>>> GetPrestamos()
         {
@@ -43,7 +44,7 @@ namespace PruebaIngresoBibliotecario.Api.Controllers
             }
 
         }
-
+*/
         //Trae un prestamo
         [HttpGet("{id}")]
         public async Task<ActionResult<Prestamo>> GetPrestamoById(string id)
